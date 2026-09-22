@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useState, useEffect } from 'react';
+=======
+import { useState, useEffect, useRef } from 'react';
+>>>>>>> 294c6dc (Initial commit)
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth }      from '../contexts/AuthContext';
 import { useCart }      from '../contexts/CartContext';
@@ -6,6 +10,108 @@ import { useWishlist }  from '../contexts/WishlistContext';
 import SearchBar        from './SearchBar';
 import NotificationBell from './NotificationBell';
 
+<<<<<<< HEAD
+=======
+
+/* ── Menu utilisateur déroulant ─────────────────────────────────────────── */
+function UserMenu({ user, onLogout }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  // Fermer en cliquant ailleurs
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const isAdmin      = user.role === 'libraire';
+  const isSuperAdmin = user.is_super_admin || user.role === 'super_admin';
+  const initial      = (user.prenom || user.name || '?')[0].toUpperCase();
+
+  return (
+    <div ref={ref} className="relative">
+      {/* Bouton avatar */}
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-white/10 transition group"
+      >
+        <div className="w-8 h-8 rounded-lg bg-[#c9933a] flex items-center justify-center text-white font-black text-sm flex-shrink-0">
+          {initial}
+        </div>
+        <div className="text-left hidden lg:block">
+          <p className="text-xs font-semibold text-white leading-none">
+            {user.prenom || user.name}
+          </p>
+          <p className="text-[10px] text-gray-400 leading-none mt-0.5">
+            {isSuperAdmin ? '👑 Super Admin' : isAdmin ? '🏪 Libraire' : '👤 Client'}
+          </p>
+        </div>
+        <span className={`text-gray-400 text-xs transition-transform ${open ? 'rotate-180' : ''}`}>▾</span>
+      </button>
+
+      {/* Dropdown */}
+      {open && (
+        <div className="absolute right-0 top-full mt-2 w-52 bg-[#162232] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50">
+          {/* Header */}
+          <div className="px-4 py-3 border-b border-white/10 bg-white/5">
+            <p className="text-white font-bold text-sm truncate">{user.prenom} {user.name}</p>
+            <p className="text-gray-400 text-xs truncate">{user.email}</p>
+          </div>
+
+          {/* Liens */}
+          <div className="py-1.5">
+            <MenuLink to="/profile"  icon="👤" label="Mon profil"     onClick={() => setOpen(false)} />
+            <MenuLink to="/orders"   icon="📦" label="Mes commandes"  onClick={() => setOpen(false)} />
+            <MenuLink to="/wishlist" icon="❤️" label="Mes favoris"    onClick={() => setOpen(false)} />
+            <MenuLink to="/fidelite" icon="⭐" label="Mes points"     onClick={() => setOpen(false)} />
+
+            {(isAdmin || isSuperAdmin) && (
+              <>
+                <div className="border-t border-white/10 my-1.5" />
+                {isAdmin && (
+                  <MenuLink to="/admin"   icon="⚙️" label="Administration" onClick={() => setOpen(false)}
+                    highlight />
+                )}
+                {isSuperAdmin && (
+                  <MenuLink to="/super-admin" icon="👑" label="Super Admin" onClick={() => setOpen(false)}
+                    highlight />
+                )}
+                <MenuLink to="/profile?tab=localisation" icon="🗺️" label="Ma localisation"
+                  onClick={() => setOpen(false)} />
+                <MenuLink to="/profile?tab=paiement"     icon="💳" label="Mes paiements"
+                  onClick={() => setOpen(false)} />
+              </>
+            )}
+          </div>
+
+          {/* Déconnexion */}
+          <div className="border-t border-white/10 p-1.5">
+            <button onClick={() => { setOpen(false); onLogout(); }}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-red-400 hover:bg-red-400/10 transition font-medium">
+              <span>🚪</span> Déconnexion
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MenuLink({ to, icon, label, onClick, highlight }) {
+  return (
+    <Link to={to} onClick={onClick}
+      className={`flex items-center gap-3 px-3 py-2 mx-1.5 rounded-xl text-sm transition font-medium
+        ${highlight
+          ? 'text-[#c9933a] hover:bg-[#c9933a]/15'
+          : 'text-gray-300 hover:text-white hover:bg-white/8'}`}>
+      <span>{icon}</span>
+      <span>{label}</span>
+    </Link>
+  );
+}
+
+>>>>>>> 294c6dc (Initial commit)
 export default function Navbar() {
   const { user, logout }        = useAuth();
   const { cartCount }           = useCart();
@@ -50,6 +156,11 @@ export default function Navbar() {
           {[
             { to:'/catalog',     label:'Livres' },
             { to:'/fournitures', label:'Fournitures' },
+<<<<<<< HEAD
+=======
+            { to:'/communaute',  label:'Communauté' },
+            { to:'/entreprise',  label:'Entreprise' },
+>>>>>>> 294c6dc (Initial commit)
             ...(user ? [{ to:'/orders', label:'Commandes' }] : []),
           ].map(({ to, label }) => (
             <NavLink key={to} to={to}
@@ -106,6 +217,7 @@ export default function Navbar() {
           </Link>
 
           {/* Auth desktop */}
+<<<<<<< HEAD
           <div className="hidden md:flex items-center gap-2">
             {user ? (
               <>
@@ -115,6 +227,11 @@ export default function Navbar() {
                   Déco.
                 </button>
               </>
+=======
+          <div className="hidden md:flex items-center gap-2 relative">
+            {user ? (
+              <UserMenu user={user} onLogout={handleLogout} />
+>>>>>>> 294c6dc (Initial commit)
             ) : (
               <>
                 <Link to="/login" className="text-sm text-gray-400 hover:text-white px-2 py-1.5 transition">Connexion</Link>

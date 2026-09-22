@@ -237,6 +237,7 @@ export default function OrderDevis({ order, isAdmin = false, autoExport = false 
           </div>
         </div>
 
+<<<<<<< HEAD
         {/* Statut + mode de paiement */}
         <div className="px-7 py-2.5 border-b bg-emerald-50 flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2">
@@ -250,6 +251,49 @@ export default function OrderDevis({ order, isAdmin = false, autoExport = false 
               </span>
             </div>
           )}
+=======
+        {/* Statut + mode livraison + paiement */}
+        <div className="border-b">
+          <div className="px-7 py-2.5 bg-emerald-50 flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+              <span className="text-sm font-semibold text-emerald-800">Statut : {order.statut ?? 'Validée'}</span>
+            </div>
+            {paymentMethod && (
+              <span className="text-sm font-semibold text-gray-600">
+                💳 Paiement : <span className="text-[#1e3a5f]">{paymentMethod}</span>
+              </span>
+            )}
+          </div>
+          {/* Mode de réception — section visible et mise en valeur */}
+          <div className={`px-7 py-3 flex items-center gap-4 ${
+            order.delivery_mode === 'pickup'
+              ? 'bg-blue-50 border-t border-blue-100'
+              : 'bg-amber-50 border-t border-amber-100'
+          }`}>
+            <span className="text-2xl flex-shrink-0">
+              {order.delivery_mode === 'pickup' ? '🏪' : '🚚'}
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className={`text-sm font-extrabold ${order.delivery_mode === 'pickup' ? 'text-blue-800' : 'text-amber-800'}`}>
+                {order.delivery_mode === 'pickup' ? 'Retrait en boutique' : 'Livraison à domicile'}
+              </p>
+              <p className={`text-xs mt-0.5 ${order.delivery_mode === 'pickup' ? 'text-blue-600' : 'text-amber-600'}`}>
+                {order.delivery_mode === 'pickup'
+                  ? `📍 ${STORE_ADDRESS}  ·  📞 ${STORE_PHONE}`
+                  : `📍 ${order.adresse || 'Adresse fournie'}`}
+              </p>
+            </div>
+            {order.delivery_mode === 'pickup' && (
+              <span className="text-xs font-bold text-green-700 bg-green-100 px-2.5 py-1 rounded-full flex-shrink-0">Gratuit</span>
+            )}
+            {order.delivery_mode !== 'pickup' && parseFloat(order.frais_livraison ?? 0) > 0 && (
+              <span className="text-xs font-bold text-amber-700 bg-amber-100 px-2.5 py-1 rounded-full flex-shrink-0">
+                +{new Intl.NumberFormat('fr-FR').format(order.frais_livraison)} FCFA
+              </span>
+            )}
+          </div>
+>>>>>>> 294c6dc (Initial commit)
         </div>
 
         {/* Articles */}
@@ -300,6 +344,7 @@ export default function OrderDevis({ order, isAdmin = false, autoExport = false 
             {savings > 10 && (
               <>
                 <div className="flex justify-between text-sm text-gray-500">
+<<<<<<< HEAD
                   <span>Sous-total</span><span className="line-through">{formatCFA(originalTotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-emerald-700 font-semibold">
@@ -307,6 +352,29 @@ export default function OrderDevis({ order, isAdmin = false, autoExport = false 
                 </div>
               </>
             )}
+=======
+                  <span>Sous-total articles</span><span className="line-through">{formatCFA(originalTotal)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-emerald-700 font-semibold">
+                  <span>🎉 Remises promotions</span><span>-{formatCFA(savings)}</span>
+                </div>
+              </>
+            )}
+            {order.delivery_mode === 'pickup' ? (
+              <div className="flex justify-between text-sm text-blue-700 font-semibold">
+                <span>🏪 Retrait en boutique</span><span className="text-green-600">Gratuit</span>
+              </div>
+            ) : parseFloat(order.frais_livraison ?? 0) > 0 ? (
+              <div className="flex justify-between text-sm text-gray-700">
+                <span>🚚 Frais de livraison</span><span>+{formatCFA(parseFloat(order.frais_livraison))}</span>
+              </div>
+            ) : null}
+            {parseFloat(order.coupon_remise ?? 0) > 0 && (
+              <div className="flex justify-between text-sm text-red-600 font-semibold">
+                <span>🏷️ Coupon</span><span>-{formatCFA(parseFloat(order.coupon_remise))}</span>
+              </div>
+            )}
+>>>>>>> 294c6dc (Initial commit)
             <div className="flex justify-between font-extrabold text-lg border-t-2 border-[#1e3a5f]/30 pt-2 text-[#1e3a5f]">
               <span>TOTAL TTC</span><span>{formatCFA(total)}</span>
             </div>

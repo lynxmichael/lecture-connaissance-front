@@ -19,7 +19,15 @@ export default function LoginPage() {
     try {
       const res = await login(email, password);
       showToast('Connexion réussie ✓', 'success');
+<<<<<<< HEAD
       navigate(from || (res?.role === 'libraire' ? '/admin' : '/'), { replace: true });
+=======
+      const dest = from
+        || (res?.is_super_admin || res?.role === 'super_admin' ? '/super-admin'
+          : res?.role === 'libraire' ? '/admin'
+          : '/');
+      navigate(dest, { replace: true });
+>>>>>>> 294c6dc (Initial commit)
     } catch (err) {
       const msg = err.response?.data?.errors?.email?.[0]
         || err.response?.data?.message
@@ -110,7 +118,12 @@ export default function LoginPage() {
           {/* Demo */}
           <div className="mt-5 bg-white/5 rounded-xl p-3 text-xs text-gray-500 text-center">
             <p className="font-semibold text-gray-400 mb-1">Comptes démo</p>
+<<<<<<< HEAD
             <p>admin@lectureconnaissance.com · Admin@2024!</p>
+=======
+            <p>👤 admin@lectureconnaissance.com · Admin@2024!</p>
+            <p className="mt-1">🔑 superadmin@lecture-connaissance.ci · SuperAdmin2026!</p>
+>>>>>>> 294c6dc (Initial commit)
           </div>
         </div>
       </div>
