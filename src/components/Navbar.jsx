@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { useState, useEffect } from 'react';
-=======
 import { useState, useEffect, useRef } from 'react';
->>>>>>> 294c6dc (Initial commit)
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth }      from '../contexts/AuthContext';
 import { useCart }      from '../contexts/CartContext';
@@ -10,8 +6,6 @@ import { useWishlist }  from '../contexts/WishlistContext';
 import SearchBar        from './SearchBar';
 import NotificationBell from './NotificationBell';
 
-<<<<<<< HEAD
-=======
 
 /* ── Menu utilisateur déroulant ─────────────────────────────────────────── */
 function UserMenu({ user, onLogout }) {
@@ -25,7 +19,7 @@ function UserMenu({ user, onLogout }) {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const isAdmin      = user.role === 'libraire';
+  const isAdmin      = user.role === 'libraire' || !!user.is_shop_member; // collaborateurs inclus
   const isSuperAdmin = user.is_super_admin || user.role === 'super_admin';
   const initial      = (user.prenom || user.name || '?')[0].toUpperCase();
 
@@ -111,7 +105,6 @@ function MenuLink({ to, icon, label, onClick, highlight }) {
   );
 }
 
->>>>>>> 294c6dc (Initial commit)
 export default function Navbar() {
   const { user, logout }        = useAuth();
   const { cartCount }           = useCart();
@@ -156,11 +149,8 @@ export default function Navbar() {
           {[
             { to:'/catalog',     label:'Livres' },
             { to:'/fournitures', label:'Fournitures' },
-<<<<<<< HEAD
-=======
             { to:'/communaute',  label:'Communauté' },
             { to:'/entreprise',  label:'Entreprise' },
->>>>>>> 294c6dc (Initial commit)
             ...(user ? [{ to:'/orders', label:'Commandes' }] : []),
           ].map(({ to, label }) => (
             <NavLink key={to} to={to}
@@ -171,7 +161,7 @@ export default function Navbar() {
               {label}
             </NavLink>
           ))}
-          {user?.role === 'libraire' && (
+          {(user?.role === 'libraire' || user?.is_shop_member) && (
             <NavLink to="/admin"
               className={({ isActive }) =>
                 `px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
@@ -217,21 +207,9 @@ export default function Navbar() {
           </Link>
 
           {/* Auth desktop */}
-<<<<<<< HEAD
-          <div className="hidden md:flex items-center gap-2">
-            {user ? (
-              <>
-                <span className="text-xs text-gray-400 max-w-[90px] truncate">{user.prenom || user.name}</span>
-                <button onClick={handleLogout}
-                  className="text-xs text-red-400 hover:text-red-300 px-3 py-1.5 rounded-lg hover:bg-red-400/10 transition">
-                  Déco.
-                </button>
-              </>
-=======
           <div className="hidden md:flex items-center gap-2 relative">
             {user ? (
               <UserMenu user={user} onLogout={handleLogout} />
->>>>>>> 294c6dc (Initial commit)
             ) : (
               <>
                 <Link to="/login" className="text-sm text-gray-400 hover:text-white px-2 py-1.5 transition">Connexion</Link>
@@ -278,7 +256,7 @@ export default function Navbar() {
               {label}
             </NavLink>
           ))}
-          {user?.role === 'libraire' && (
+          {(user?.role === 'libraire' || user?.is_shop_member) && (
             <NavLink to="/admin" className="block px-4 py-2.5 rounded-xl text-sm font-semibold text-[#c9933a] hover:bg-[#c9933a]/10 transition">
               ⚙️ Administration
             </NavLink>

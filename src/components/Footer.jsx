@@ -10,11 +10,10 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
 
-<<<<<<< HEAD
+
           {/* Brand */}
-=======
-          {/* Brand + infos + mini-carte */}
->>>>>>> 294c6dc (Initial commit)
+
+
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2.5 mb-4">
               <span className="w-10 h-10 bg-[#c9933a] rounded-xl flex items-center justify-center text-xl">📚</span>
@@ -26,13 +25,12 @@ export default function Footer() {
             <p className="text-xs leading-relaxed mb-4">
               Votre librairie-papeterie de référence à Abidjan. Livres, fournitures scolaires et matériel de bureau livrés rapidement.
             </p>
-<<<<<<< HEAD
+
             <div className="space-y-1 text-xs">
               <p>📍 Avenue de la République, Cocody, Abidjan</p>
               <p>📞 <a href="tel:+22507000000000" className="hover:text-[#c9933a] transition">+225 07 00 00 00 00</a></p>
               <p>✉️ <a href="mailto:contact@lecture-connaissance.ci" className="hover:text-[#c9933a] transition">contact@lecture-connaissance.ci</a></p>
             </div>
-=======
             <div className="space-y-1.5 text-xs mb-4">
               <p>📍 Avenue de la République, Cocody, Abidjan</p>
               <p>📞 <a href="tel:+22507000000000" className="hover:text-[#c9933a] transition">+225 07 00 00 00 00</a></p>
@@ -60,7 +58,7 @@ export default function Footer() {
                 </div>
               </div>
             </a>
->>>>>>> 294c6dc (Initial commit)
+
           </div>
 
           {/* Catalogue */}
@@ -68,21 +66,20 @@ export default function Footer() {
             <p className="text-white font-bold text-sm mb-4 uppercase tracking-wide">Catalogue</p>
             <ul className="space-y-2 text-xs">
               <li><Link to="/catalog" className="hover:text-[#c9933a] transition">📚 Tous les livres</Link></li>
-<<<<<<< HEAD
+
               <li><Link to="/catalog?rayon=Informatique"   className="hover:text-[#c9933a] transition">💻 Informatique</Link></li>
               <li><Link to="/catalog?rayon=Littérature"   className="hover:text-[#c9933a] transition">📖 Littérature</Link></li>
               <li><Link to="/catalog?rayon=Sciences"      className="hover:text-[#c9933a] transition">🔬 Sciences</Link></li>
               <li><Link to="/catalog?rayon=Histoire"      className="hover:text-[#c9933a] transition">🏛️ Histoire</Link></li>
               <li><Link to="/catalog?promo_only=1"        className="hover:text-[#c9933a] transition">🔥 Promotions</Link></li>
               <li><Link to="/kits"                          className="hover:text-[#c9933a] transition">🎒 Kits scolaires</Link></li>
-=======
+
               <li><Link to="/catalog?rayon=Informatique"  className="hover:text-[#c9933a] transition">💻 Informatique</Link></li>
               <li><Link to="/catalog?rayon=Littérature"  className="hover:text-[#c9933a] transition">📖 Littérature</Link></li>
               <li><Link to="/catalog?rayon=Sciences"     className="hover:text-[#c9933a] transition">🔬 Sciences</Link></li>
               <li><Link to="/catalog?rayon=Histoire"     className="hover:text-[#c9933a] transition">🏛️ Histoire</Link></li>
               <li><Link to="/catalog?promo_only=1"       className="hover:text-[#c9933a] transition">🔥 Promotions</Link></li>
-              <li><Link to="/kits"                         className="hover:text-[#c9933a] transition">🎒 Kits scolaires</Link></li>
->>>>>>> 294c6dc (Initial commit)
+
             </ul>
           </div>
 
@@ -131,11 +128,9 @@ export default function Footer() {
         <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs">
           <p>© {year} Lecture & Connaissance · Abidjan, Côte d'Ivoire · RCCM CI-ABJ-2024-B-00123</p>
           <div className="flex gap-4">
-<<<<<<< HEAD
+
             <span className="hover:text-[#c9933a] cursor-pointer transition">Conditions générales</span>
-=======
-            <Link to="/conditions" className="hover:text-[#c9933a] transition">Conditions générales</Link>
->>>>>>> 294c6dc (Initial commit)
+
             <span className="hover:text-[#c9933a] cursor-pointer transition">Politique de confidentialité</span>
           </div>
         </div>

@@ -2,24 +2,12 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api',
-<<<<<<< HEAD
-  // withCredentials retiré : on utilise Bearer token, pas les cookies Sanctum
-=======
   headers: { Accept: 'application/json' },
->>>>>>> 294c6dc (Initial commit)
 });
 
 // Ajouter automatiquement le token Bearer
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-<<<<<<< HEAD
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-=======
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -40,16 +28,10 @@ const notifySubscriptionBlocked = (message) => {
   setTimeout(() => { subscriptionEventSent = false; }, 3000);
 };
 
->>>>>>> 294c6dc (Initial commit)
 // Gestion globale des erreurs
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-<<<<<<< HEAD
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-    }
-=======
     const status = error.response?.status;
     const code   = error.response?.data?.code;
 
@@ -67,13 +49,8 @@ api.interceptors.response.use(
       notifySubscriptionBlocked(error.response.data.message);
     }
 
->>>>>>> 294c6dc (Initial commit)
     return Promise.reject(error);
   }
 );
 
-<<<<<<< HEAD
 export default api;
-=======
-export default api;
->>>>>>> 294c6dc (Initial commit)

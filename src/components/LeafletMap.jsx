@@ -73,11 +73,23 @@ export function MapView({ stores = [], center, height = '380px', zoom = 13 }) {
     }).addTo(map);
 
     // Marqueurs pour chaque librairie
-    stores.forEach((store, i) => {
+    // Les textes viennent des libraires : échappés avant d'entrer dans le HTML
+    // de la bulle (sinon un nom de librairie pouvait injecter du code).
+    const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+
+    stores.forEach((store) => {
       if (!store.latitude || !store.longitude) return;
 
+      // Plan d'abonnement : prioritaire (Premium) en or, mise en avant (Professionnel) en bleu
+      const color = store.priority ? '#c9933a' : store.featured ? '#2563eb' : '#2d7a4f';
+      const badge = store.priority
+        ? '<p style="display:inline-block;background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;margin:0 0 6px">★ Librairie recommandée</p>'
+        : store.featured
+          ? '<p style="display:inline-block;background:#dbeafe;color:#1e40af;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;margin:0 0 6px">Mise en avant</p>'
+          : '';
+
       const icon = L.divIcon({
-        html:      MARKER_SVG(i === 0 ? '#c9933a' : '#2d7a4f'),
+        html:      MARKER_SVG(color),
         iconSize:  [32, 42],
         iconAnchor:[16, 42],
         popupAnchor:[0, -44],
@@ -86,10 +98,11 @@ export function MapView({ stores = [], center, height = '380px', zoom = 13 }) {
 
       const popup = `
         <div style="min-width:180px;font-family:sans-serif">
-          <p style="font-weight:700;font-size:14px;margin:0 0 4px;color:#0f1923">📚 ${store.name}</p>
-          ${store.address ? `<p style="font-size:12px;color:#555;margin:0 0 3px">📍 ${store.address}</p>` : ''}
-          ${store.phone   ? `<p style="font-size:12px;color:#555;margin:0 0 6px">📞 ${store.phone}</p>`   : ''}
-          <a href="https://maps.google.com/?q=${store.latitude},${store.longitude}"
+          ${badge}
+          <p style="font-weight:700;font-size:14px;margin:0 0 4px;color:#0f1923">📚 ${esc(store.name)}</p>
+          ${store.address ? `<p style="font-size:12px;color:#555;margin:0 0 3px">📍 ${esc(store.address)}</p>` : ''}
+          ${store.phone   ? `<p style="font-size:12px;color:#555;margin:0 0 6px">📞 ${esc(store.phone)}</p>`   : ''}
+          <a href="https://maps.google.com/?q=${Number(store.latitude)},${Number(store.longitude)}"
              target="_blank"
              style="display:inline-block;background:#c9933a;color:white;font-size:11px;
                     font-weight:700;padding:4px 10px;border-radius:8px;text-decoration:none">
@@ -97,7 +110,7 @@ export function MapView({ stores = [], center, height = '380px', zoom = 13 }) {
           </a>
         </div>`;
 
-      L.marker([store.latitude, store.longitude], { icon })
+      L.marker([store.latitude, store.longitude], { icon, zIndexOffset: (store.rank ?? 1) * 100 })
         .addTo(map)
         .bindPopup(popup);
     });

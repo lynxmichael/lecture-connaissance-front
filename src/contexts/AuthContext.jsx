@@ -1,17 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import api from '../api/client';
 
-<<<<<<< HEAD
-export const AuthContext = createContext(null);
-export const useAuth = () => useContext(AuthContext);
-
-export const AuthProvider = ({ children }) => {
-  const [user, setUser]       = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const logout = useCallback(async () => {
-    try { await api.post('/logout'); } catch (_) {}
-=======
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext(null);
 // eslint-disable-next-line react-refresh/only-export-components
@@ -23,13 +12,10 @@ export const AuthProvider = ({ children }) => {
 
   const logout = useCallback(async () => {
     try { await api.post('/logout'); } catch { /* token déjà invalide */ }
->>>>>>> 294c6dc (Initial commit)
     localStorage.removeItem('token');
     setUser(null);
   }, []);
 
-<<<<<<< HEAD
-=======
   // Recharge les infos utilisateur depuis l'API.
   // Utilisé après un paiement pour débloquer l'app immédiatement.
   const refreshUser = useCallback(async () => {
@@ -49,7 +35,6 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
->>>>>>> 294c6dc (Initial commit)
   useEffect(() => {
     let mounted = true;
     const init = async () => {
@@ -58,13 +43,8 @@ export const AuthProvider = ({ children }) => {
       try {
         const res = await api.get('/user');
         if (mounted) setUser(res.data);
-<<<<<<< HEAD
-      } catch {
-        if (mounted) { localStorage.removeItem('token'); }
-=======
       } catch (e) {
         if (mounted && e.response?.status === 401) localStorage.removeItem('token');
->>>>>>> 294c6dc (Initial commit)
       } finally {
         if (mounted) setLoading(false);
       }
@@ -73,8 +53,6 @@ export const AuthProvider = ({ children }) => {
     return () => { mounted = false; };
   }, []);
 
-<<<<<<< HEAD
-=======
   // Une route a répondu « abonnement suspendu » (403 SUBSCRIPTION_*) :
   // on recharge l'utilisateur → l'écran de renouvellement s'affiche.
   useEffect(() => {
@@ -83,16 +61,11 @@ export const AuthProvider = ({ children }) => {
     return () => window.removeEventListener('subscription:blocked', onBlocked);
   }, [refreshUser]);
 
->>>>>>> 294c6dc (Initial commit)
   const login = async (email, password) => {
     const res = await api.post('/login', { email, password });
     localStorage.setItem('token', res.data.token);
     setUser(res.data.user);
-<<<<<<< HEAD
-    return res.data.user; // retourne le user pour la redirection dans LoginPage
-=======
     return res.data.user;
->>>>>>> 294c6dc (Initial commit)
   };
 
   const register = async (data) => {
@@ -102,11 +75,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-<<<<<<< HEAD
-    <AuthContext.Provider value={{ user, setUser, loading, login, register, logout }}>
-=======
     <AuthContext.Provider value={{ user, setUser, loading, login, register, logout, refreshUser }}>
->>>>>>> 294c6dc (Initial commit)
       {children}
     </AuthContext.Provider>
   );

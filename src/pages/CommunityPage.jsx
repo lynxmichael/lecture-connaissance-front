@@ -80,8 +80,34 @@ function PostCard({ post, onLike, onSelect }) {
   );
 }
 
-function PostDetail({ post, onClose, onLike, user }) {
+function PostDetail({ post, onClose, onLike, user, onPostUpdated, onPostDeleted }) {
   const [replies, setReplies] = useState(post.replies || []);
+  const [moderating, setModerating] = useState(false);
+
+  // Modération réservée au super admin ; chacun peut supprimer son propre sujet
+  const isSuperAdmin = !!user && (user.is_super_admin || user.role === 'super_admin');
+  const isAuthor     = !!user && user.id === post.user?.id;
+
+  const moderate = async (action) => {
+    setModerating(true);
+    try {
+      if (action === 'delete') {
+        if (!confirm(isAuthor ? 'Supprimer votre sujet ?' : 'Supprimer ce sujet (modération) ?')) return;
+        await api.delete(`/community/posts/${post.id}`);
+        onPostDeleted?.(post.id);
+      } else if (action === 'pin') {
+        const res = await api.patch(`/community/posts/${post.id}/pin`);
+        onPostUpdated?.(post.id, { is_pinned: res.data.is_pinned });
+      } else if (action === 'status') {
+        const res = await api.patch(`/community/posts/${post.id}/status`);
+        onPostUpdated?.(post.id, { status: res.data.status });
+      }
+    } catch (e) {
+      alert(e.response?.data?.message || 'Action impossible.');
+    } finally {
+      setModerating(false);
+    }
+  };
   const [newReply, setNewReply] = useState('');
   const [sending, setSending] = useState(false);
   const [editingReplyId, setEditingReplyId] = useState(null);
@@ -103,8 +129,12 @@ function PostDetail({ post, onClose, onLike, user }) {
 
   const handleDeleteReply = async (replyId) => {
     if (!confirm('Supprimer cette réponse ?')) return;
-    await api.delete(`/community/replies/${replyId}`);
-    setReplies(prev => prev.filter(r => r.id !== replyId));
+    try {
+      await api.delete(`/community/replies/${replyId}`);
+      setReplies(prev => prev.filter(r => r.id !== replyId));
+    } catch (e) {
+      alert(e.response?.data?.message || 'Suppression impossible.');
+    }
   };
 
   const handleSaveEdit = async (replyId) => {
@@ -161,6 +191,28 @@ function PostDetail({ post, onClose, onLike, user }) {
               {post.liked_by_me ? '❤️' : '🤍'} {post.likes || 0} j'aime
             </button>
           </div>
+
+          {(isSuperAdmin || isAuthor) && (
+            <div className="flex flex-wrap items-center gap-2 pt-3 mt-4 border-t border-gray-100">
+              {isSuperAdmin && (
+                <>
+                  <span className="mr-1 text-xs font-semibold tracking-wide text-gray-400 uppercase">Modération</span>
+                  <button type="button" disabled={moderating} onClick={() => moderate('pin')}
+                    className="px-3 py-1 text-xs font-medium rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 disabled:opacity-50">
+                    {post.is_pinned ? '📌 Désépingler' : '📌 Épingler'}
+                  </button>
+                  <button type="button" disabled={moderating} onClick={() => moderate('status')}
+                    className="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50">
+                    {post.status === 'closed' ? '🔓 Rouvrir' : '🔒 Fermer'}
+                  </button>
+                </>
+              )}
+              <button type="button" disabled={moderating} onClick={() => moderate('delete')}
+                className="px-3 py-1 text-xs font-medium text-red-600 rounded-lg bg-red-50 hover:bg-red-100 disabled:opacity-50">
+                🗑 Supprimer
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Replies */}
@@ -183,11 +235,12 @@ function PostDetail({ post, onClose, onLike, user }) {
                     >
                       {reply.liked_by_me ? '❤️' : '🤍'} {reply.likes || 0}
                     </button>
-                    {user && (user.id === reply.user?.id || user.role === 'libraire') && (
-                      <>
-                        <button className="text-xs text-blue-400 hover:text-blue-600" onClick={() => { setEditingReplyId(reply.id); setEditContent(reply.content); }}>✏️</button>
-                        <button className="text-xs text-red-400 hover:text-red-600" onClick={() => handleDeleteReply(reply.id)}>🗑</button>
-                      </>
+                    {/* Modifier : auteur uniquement — Supprimer : auteur ou super admin */}
+                    {user && user.id === reply.user?.id && (
+                      <button className="text-xs text-blue-400 hover:text-blue-600" onClick={() => { setEditingReplyId(reply.id); setEditContent(reply.content); }}>✏️</button>
+                    )}
+                    {user && (user.id === reply.user?.id || isSuperAdmin) && (
+                      <button className="text-xs text-red-400 hover:text-red-600" onClick={() => handleDeleteReply(reply.id)}>🗑</button>
                     )}
                   </div>
                 </div>
@@ -550,6 +603,14 @@ export default function CommunityPage() {
           post={selectedPost}
           onClose={() => setSelectedPost(null)}
           onLike={handleLike}
+          onPostUpdated={(id, changes) => {
+            setPosts(prev => prev.map(p => p.id === id ? { ...p, ...changes } : p));
+            setSelectedPost(prev => (prev && prev.id === id ? { ...prev, ...changes } : prev));
+          }}
+          onPostDeleted={(id) => {
+            setPosts(prev => prev.filter(p => p.id !== id));
+            setSelectedPost(null);
+          }}
           user={user}
         />
       )}
