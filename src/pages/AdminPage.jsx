@@ -8,6 +8,9 @@ import StatusBadge from '../components/StatusBadge';
 import OrderDevis from '../components/OrderDevis';
 import PayoutsPanel from '../components/PayoutsPanel';
 import ShopCouponsPanel from '../components/ShopCouponsPanel';
+import ShopFeaturesPanel from '../components/ShopFeaturesPanel';
+import PurchaseOrdersPanel from '../components/PurchaseOrdersPanel';
+import { downloadBusinessDocument, downloadTablePdf } from '../utils/pdfDocuments';
 
 const STATUTS  = ['En cours','Validée','Expédiée','Annulée'];
 const RAYONS   = ['Informatique','Sciences','Littérature','Histoire','Arts','Philosophie'];
@@ -245,6 +248,36 @@ export default function AdminPage() {
     }
   };
 
+  // Export PDF (plan Premium) : mêmes données que le CSV, mises en page
+  const downloadPdfExport = async (type) => {
+    try {
+      const { data } = await api.get(`/admin/export/${type}`, { params: { format: 'json' } });
+      await downloadTablePdf({
+        title:    type === 'orders' ? 'Commandes' : 'Catalogue',
+        subtitle: data.subtitle || new Date().toLocaleDateString('fr-FR'),
+        // Le serveur décrit le format ('money') ; la mise en page l'applique
+        columns:  (data.columns || []).map(c => ({
+          ...c,
+          format: c.format === 'money' ? (v) => new Intl.NumberFormat('fr-FR').format(Number(v) || 0) : undefined,
+        })),
+        rows:     data.rows,
+        filename: `${type === 'orders' ? 'commandes' : 'catalogue'}-${new Date().toISOString().slice(0,10)}.pdf`,
+      });
+    } catch (err) {
+      showToast(err.response?.data?.message || "Impossible de générer le PDF", 'error');
+    }
+  };
+
+  // Facture de la librairie pour une commande (plans Professionnel et Premium)
+  const downloadInvoice = async (orderId) => {
+    try {
+      const { data } = await api.get(`/admin/orders/${orderId}/invoice`);
+      await downloadBusinessDocument(data);
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Facture indisponible', 'error');
+    }
+  };
+
   /* ── Helpers images ─────────────────────────────────────────────────────── */
   const uploadImages = async (files, itemType, itemId, setUploading) => {
     if (!files?.length) return;
@@ -455,11 +488,19 @@ export default function AdminPage() {
         <Tab id="promos"      icon="🏷️" label="Promotions" badge={promos.filter(p=>p.is_currently_active).length} />
         <Tab id="commandes"   icon="📦" label="Commandes" badge={orders.filter(o=>o.statut==='En cours').length} />
         <Tab id="fournitures" icon="✏️" label="Fournitures" badge={fournitures.filter(f=>f.quantite<5).length||null} />
+        <Tab id="bons"        icon="📋" label="Bons de commande" />
+        <Tab id="boutique"    icon="🏪" label="Ma librairie" />
         <Tab id="versements"  icon="💸" label="Versements" />
       </div>
 
       {/* ══════ VERSEMENTS (part de chaque libraire sur les paiements clients) ══════ */}
       {tab==='versements' && <PayoutsPanel isSuperAdmin={!!currentUser?.is_super_admin} />}
+
+      {/* ══════ BONS DE COMMANDE (clients professionnels — plan Premium) ══════ */}
+      {tab==='bons' && <PurchaseOrdersPanel allowed={!!(caps.purchase_orders || currentUser?.is_super_admin)} />}
+
+      {/* ══════ MA LIBRAIRIE (facturation, fidélité, clés d'API) ══════ */}
+      {tab==='boutique' && <ShopFeaturesPanel caps={currentUser?.is_super_admin ? { custom_invoicing:true, loyalty:true, api_access:true } : caps} />}
 
       {/* ══════ DASHBOARD ══════ */}
       {tab==='dashboard' && (
@@ -488,6 +529,14 @@ export default function AdminPage() {
               <div className="flex gap-3 mb-6 flex-wrap">
                   <button type="button" onClick={()=>downloadExport('orders')} className="flex items-center gap-2 bg-white border-2 border-[#e8e0d4] text-gray-700 px-4 py-2 rounded-xl text-sm font-semibold hover:border-[#c9933a] hover:text-[#c9933a] transition">📥 Exporter commandes (CSV)</button>
                   <button type="button" onClick={()=>downloadExport('products')} className="flex items-center gap-2 bg-white border-2 border-[#e8e0d4] text-gray-700 px-4 py-2 rounded-xl text-sm font-semibold hover:border-[#c9933a] hover:text-[#c9933a] transition">📊 Exporter catalogue (CSV)</button>
+                {caps.pdf_exports && (<>
+                  <button type="button" onClick={()=>downloadPdfExport('orders')} className="flex items-center gap-2 bg-white border-2 border-[#e8e0d4] text-gray-700 px-4 py-2 rounded-xl text-sm font-semibold hover:border-[#c9933a] hover:text-[#c9933a] transition">🧾 Commandes (PDF)</button>
+                  <button type="button" onClick={()=>downloadPdfExport('products')} className="flex items-center gap-2 bg-white border-2 border-[#e8e0d4] text-gray-700 px-4 py-2 rounded-xl text-sm font-semibold hover:border-[#c9933a] hover:text-[#c9933a] transition">🧾 Catalogue (PDF)</button>
+                </>)}
+                  {caps.pdf_exports && (<>
+                    <button type="button" onClick={()=>downloadPdfExport('orders')} className="flex items-center gap-2 bg-white border-2 border-[#e8e0d4] text-gray-700 px-4 py-2 rounded-xl text-sm font-semibold hover:border-[#c9933a] hover:text-[#c9933a] transition">🧾 Commandes (PDF)</button>
+                    <button type="button" onClick={()=>downloadPdfExport('products')} className="flex items-center gap-2 bg-white border-2 border-[#e8e0d4] text-gray-700 px-4 py-2 rounded-xl text-sm font-semibold hover:border-[#c9933a] hover:text-[#c9933a] transition">🧾 Catalogue (PDF)</button>
+                  </>)}
                 </div>
               ) : (
                 <div className="mb-6"><PlanLock>L'export CSV des commandes et du catalogue est inclus à partir du plan Professionnel.</PlanLock></div>
@@ -903,11 +952,17 @@ export default function AdminPage() {
                         </div>
                       ))}
                     </div>
-                    <div className="mt-4 pt-3 border-t">
+                    <div className="flex flex-wrap items-center mt-4 pt-3 border-t">
                       <button onClick={()=>setDevisOrderId(devisOrderId===order.id?null:order.id)}
                         className="flex items-center gap-1.5 bg-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">
                         📄 {devisOrderId===order.id?'Fermer':'Voir le devis'}
                       </button>
+                      {(caps.custom_invoicing || currentUser?.is_super_admin) && order.statut!=='Annulée' && (
+                        <button onClick={()=>downloadInvoice(order.id)}
+                          className="flex items-center gap-1.5 bg-[#1e3a5f] text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-[#16304f] transition ml-2">
+                          🧾 Facture (PDF)
+                        </button>
+                      )}
                     </div>
                     {devisOrderId===order.id&&<div className="mt-4"><OrderDevis order={{...order,client_telephone:order.client_telephone||order.telephone}} isAdmin={true}/></div>}
                   </div>

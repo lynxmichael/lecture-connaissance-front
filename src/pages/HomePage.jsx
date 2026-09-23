@@ -6,6 +6,7 @@ import BookCard from '../components/BookCard';
 import { useCart } from '../contexts/CartContext';
 import { showToast } from '../components/Toast';
 import { MapView } from '../components/LeafletMap';
+import { useEffect, useState } from 'react';
 
 const RAYONS = [
   {

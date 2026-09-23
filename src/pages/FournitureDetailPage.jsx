@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { showToast } from '../components/Toast';
 import { useWishlist } from '../contexts/WishlistContext';
-
+import { useEffect, useState } from 'react';
 import { formatCFA, discountPercent } from '../utils/currency';
 import { addRecentlyViewed } from '../utils/recentlyViewed';
 

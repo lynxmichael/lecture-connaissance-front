@@ -4,6 +4,7 @@ import api from '../api/client';
 import { useAuth } from '../contexts/AuthContext';
 import StatusBadge from '../components/StatusBadge';
 import OrderDevis from '../components/OrderDevis';
+import { downloadBusinessDocument } from '../utils/pdfDocuments';
 import { showToast } from '../components/Toast';
 import { formatCFA } from '../utils/currency';
 
@@ -22,6 +23,20 @@ export default function OrdersPage() {
       .finally(() => setLoading(false));
   };
   useEffect(() => { fetchOrders(); }, []);
+
+  // Une facture par librairie de la commande (plans Professionnel et Premium)
+  const downloadInvoices = async (orderId) => {
+    try {
+      const { data } = await api.get(`/orders/${orderId}/invoices`);
+      if (!data?.length) {
+        showToast("Aucune facture : cette librairie n'émet pas de facture personnalisée.", 'info');
+        return;
+      }
+      for (const invoice of data) await downloadBusinessDocument(invoice);
+    } catch {
+      showToast('Facture indisponible pour le moment', 'error');
+    }
+  };
 
   const handleCancel = async (orderId) => {
     if (!confirm('Annuler cette commande ?')) return;
@@ -136,6 +151,14 @@ export default function OrdersPage() {
                       className="flex items-center gap-2 bg-[#0f1923] text-white text-sm px-4 py-2 rounded-xl hover:bg-[#c9933a] transition font-semibold">
                       📄 {devisId===order.id ? 'Fermer le devis' : 'Mon bon de commande'}
                     </button>
+
+                    {/* Factures des librairies dont le plan inclut la facturation personnalisée */}
+                    {order.statut!=='Annulée' && (
+                      <button onClick={() => downloadInvoices(order.id)}
+                        className="flex items-center gap-2 bg-white border-2 border-[#e8e0d4] text-[#0f1923] text-sm px-4 py-2 rounded-xl hover:border-[#c9933a] hover:text-[#c9933a] transition font-semibold">
+                        🧾 Facture (PDF)
+                      </button>
+                    )}
 
                     {order.statut!=='Expédiée' && order.statut!=='Annulée' && (
                       <button onClick={() => handleCancel(order.id)}

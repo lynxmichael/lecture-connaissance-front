@@ -118,21 +118,32 @@ function BarChart({ data = [], height = 120, color = '#6366f1' }) {
 }
 
 // ── Formulaire entreprise ─────────────────────────────────────────────────
-function CompanyForm({ initial = EMPTY_COMPANY, plans = [], onSave, onCancel, loading }) {
-  const [form, setForm] = useState(initial);
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
-
-  const Field = ({ label, name, type = 'text', req, children, col = 1 }) => (
+/**
+ * Champ de formulaire.
+ *
+ * Important : ce composant reste défini AU NIVEAU DU FICHIER. Quand il était
+ * déclaré à l'intérieur de CompanyForm, React le voyait comme un composant
+ * différent à chaque frappe : il démontait puis remontait l'input, ce qui
+ * faisait perdre le focus (il fallait recliquer dans le champ à chaque lettre).
+ */
+function Field({ label, name, type = 'text', req, children, col = 1, form, set }) {
+  return (
     <div className={col === 2 ? 'col-span-2' : ''}>
       <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
         {label}{req && <span className="text-red-500 ml-0.5">*</span>}
       </label>
       {children || (
         <input type={type} value={form[name] || ''} onChange={e => set(name, e.target.value)}
-          className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all" />
+          className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition" />
       )}
     </div>
   );
+}
+
+function CompanyForm({ initial = EMPTY_COMPANY, plans = [], onSave, onCancel, loading }) {
+  const [form, setForm] = useState(initial);
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
 
   return (
     <div className="space-y-6">
@@ -142,13 +153,13 @@ function CompanyForm({ initial = EMPTY_COMPANY, plans = [], onSave, onCancel, lo
           <Icon name="users" className="w-4 h-4 text-indigo-500" /> Propriétaire du compte
         </h3>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Email du propriétaire" name="owner_email" type="email" req col={2} />
+          <Field form={form} set={set} label="Email du propriétaire" name="owner_email" type="email" req col={2} />
           <div className="col-span-2 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2 text-xs text-blue-700">
             💡 Si cet email existe déjà, le compte sera mis à jour avec ce mot de passe.
           </div>
-          <Field label="Prénom" name="owner_prenom" />
-          <Field label="Nom" name="owner_name" />
-          <Field label="Téléphone" name="owner_telephone" />
+          <Field form={form} set={set} label="Prénom" name="owner_prenom" />
+          <Field form={form} set={set} label="Nom" name="owner_name" />
+          <Field form={form} set={set} label="Téléphone" name="owner_telephone" />
           {/* Mot de passe — OBLIGATOIRE */}
           <div className="col-span-2">
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
@@ -185,19 +196,19 @@ function CompanyForm({ initial = EMPTY_COMPANY, plans = [], onSave, onCancel, lo
           <Icon name="building" className="w-4 h-4 text-indigo-500" /> Informations de l'entreprise
         </h3>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Nom de l'entreprise" name="company_name" req col={2} />
-          <Field label="Email" name="company_email" type="email" />
-          <Field label="Téléphone" name="company_phone" />
-          <Field label="Secteur">
+          <Field form={form} set={set} label="Nom de l'entreprise" name="company_name" req col={2} />
+          <Field form={form} set={set} label="Email" name="company_email" type="email" />
+          <Field form={form} set={set} label="Téléphone" name="company_phone" />
+          <Field form={form} set={set} label="Secteur">
             <select value={form.company_sector || ''} onChange={e => set('company_sector', e.target.value)}
               className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
               <option value="">Sélectionner…</option>
               {SECTORS.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </Field>
-          <Field label="Adresse" name="company_address" col={2} />
-          <Field label="N° RCCM" name="rccm_number" />
-          <Field label="NIF" name="nif_number" />
+          <Field form={form} set={set} label="Adresse" name="company_address" col={2} />
+          <Field form={form} set={set} label="N° RCCM" name="rccm_number" />
+          <Field form={form} set={set} label="NIF" name="nif_number" />
         </div>
       </div>
 
@@ -207,21 +218,21 @@ function CompanyForm({ initial = EMPTY_COMPANY, plans = [], onSave, onCancel, lo
           <Icon name="chart" className="w-4 h-4 text-indigo-500" /> Abonnement
         </h3>
         <div className="grid grid-cols-3 gap-3">
-          <Field label="Plan" req>
+          <Field form={form} set={set} label="Plan" req>
             <select value={form.plan_slug || ''} onChange={e => set('plan_slug', e.target.value)}
               className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
               <option value="">Choisir un plan…</option>
               {plans.map(p => <option key={p.slug} value={p.slug}>{p.name} — {formatCFA(p.price_monthly)}/mois</option>)}
             </select>
           </Field>
-          <Field label="Cycle de facturation" req>
+          <Field form={form} set={set} label="Cycle de facturation" req>
             <select value={form.billing_cycle} onChange={e => set('billing_cycle', e.target.value)}
               className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
               <option value="monthly">Mensuel</option>
               <option value="yearly">Annuel</option>
             </select>
           </Field>
-          <Field label="Statut" req>
+          <Field form={form} set={set} label="Statut" req>
             <select value={form.status} onChange={e => set('status', e.target.value)}
               className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
               {Object.entries(STATUS_CONFIG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
@@ -249,9 +260,9 @@ function CompanyForm({ initial = EMPTY_COMPANY, plans = [], onSave, onCancel, lo
           ))}
         </div>
         <div className="grid grid-cols-3 gap-3 mt-3">
-          <Field label="🏦 Banque" name="bank_name" />
-          <Field label="N° Compte" name="bank_account_number" />
-          <Field label="IBAN" name="bank_iban" />
+          <Field form={form} set={set} label="🏦 Banque" name="bank_name" />
+          <Field form={form} set={set} label="N° Compte" name="bank_account_number" />
+          <Field form={form} set={set} label="IBAN" name="bank_iban" />
         </div>
       </div>
 

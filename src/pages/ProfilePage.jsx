@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { formatCFA } from '../utils/currency';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../api/client';
@@ -35,9 +36,16 @@ export default function ProfilePage() {
                   !!user?.is_super_admin;
 
   /* onglet actif : lu depuis l'URL (?tab=localisation) */
-  const validTabs = ['infos', 'adresses', ...(isAdmin ? ['paiement', 'localisation'] : [])];
+  const validTabs = ['infos', 'adresses', 'fidelite', ...(isAdmin ? ['paiement', 'localisation'] : [])];
   const urlTab    = searchParams.get('tab');
   const [tab, setTab] = useState(validTabs.includes(urlTab) ? urlTab : 'infos');
+  const [rewards, setRewards] = useState([]);
+
+  // Récompenses de fidélité offertes par les librairies (plan Premium)
+  useEffect(() => {
+    if (tab !== 'fidelite') return;
+    api.get('/my-rewards').then(r => setRewards(r.data || [])).catch(() => setRewards([]));
+  }, [tab]);
 
   /* formulaire principal */
   const [form, setForm] = useState({
@@ -159,6 +167,7 @@ export default function ProfilePage() {
   const TABS = [
     { id: 'infos',       label: '📋 Informations' },
     { id: 'adresses',    label: '📍 Adresses'      },
+    { id: 'fidelite',    label: '🎁 Mes récompenses' },
     ...(isAdmin ? [
       { id: 'paiement',      label: '💳 Paiement'     },
       { id: 'localisation',  label: '🗺️ Ma librairie' },
@@ -270,6 +279,44 @@ export default function ProfilePage() {
       )}
 
       {/* ══ Onglet : Paiement (admin seulement) ════════════════════════════ */}
+      {tab === 'fidelite' && (
+        <div className="bg-white border border-[#e8e0d4] rounded-2xl p-6 shadow-sm">
+          <h2 className="font-bold text-lg text-[#0f1923] mb-1">🎁 Mes récompenses fidélité</h2>
+          <p className="text-xs text-gray-500 mb-5">
+            Codes offerts par les librairies où vous achetez régulièrement. Chacun est personnel et valable
+            uniquement sur les articles de la librairie qui l'a offert.
+          </p>
+
+          {rewards.length === 0 ? (
+            <p className="text-sm text-gray-400 py-6 text-center">
+              Aucune récompense pour le moment. Continuez vos achats chez vos librairies préférées !
+            </p>
+          ) : (
+            <ul className="space-y-3">
+              {rewards.map(r => (
+                <li key={r.code} className={`border rounded-xl p-4 flex flex-wrap items-center justify-between gap-3 ${
+                  r.active ? 'border-green-200 bg-green-50' : 'border-[#e8e0d4] bg-gray-50 opacity-70'}`}>
+                  <div>
+                    <p className="font-mono font-bold text-[#0f1923]">{r.code}</p>
+                    <p className="text-xs text-gray-500">
+                      {r.shop ? `${r.shop} · ` : ''}
+                      {r.type === 'fixed' ? `${formatCFA(r.value)} de remise` : `${Number(r.value)} % de remise`}
+                      {r.expires_at ? ` · jusqu'au ${new Date(r.expires_at).toLocaleDateString('fr-FR')}` : ''}
+                    </p>
+                  </div>
+                  {r.used
+                    ? <span className="text-xs font-semibold text-gray-400">Déjà utilisée</span>
+                    : r.active
+                      ? <button type="button" onClick={() => { navigator.clipboard?.writeText(r.code); showToast('Code copié ✓', 'success'); }}
+                          className="text-xs font-semibold text-green-700 underline">Copier le code</button>
+                      : <span className="text-xs font-semibold text-gray-400">Expirée</span>}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
       {tab === 'paiement' && isAdmin && (
         <form onSubmit={handleSavePaiement}
           className="bg-white border border-[#e8e0d4] rounded-2xl p-6 shadow-sm space-y-5">
