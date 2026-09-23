@@ -6,13 +6,14 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { showToast } from '../components/Toast';
-
+import { useEffect, useState } from 'react';
 import { formatCFA, discountPercent } from '../utils/currency';
 import { addRecentlyViewed } from '../utils/recentlyViewed';
 
 import RecommendedProducts from '../components/RecommendedProducts';
 import RecentlyViewed from '../components/RecentlyViewed';
 import ImageGallery from '../components/ImageGallery';
+import React from 'react';
 
 const Stars = ({ note = 0, interactive = false, onChange }) => (
   <div className="flex gap-0.5">
