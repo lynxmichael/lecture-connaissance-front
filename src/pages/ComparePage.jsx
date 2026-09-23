@@ -5,6 +5,7 @@ import { useCart } from '../contexts/CartContext';
 import { showToast } from '../components/Toast';
 import { formatCFA, discountPercent } from '../utils/currency';
 import { getEmoji } from '../utils/fournitures';
+import ProductImage from '../components/ProductImage';
 
 export default function ComparePage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -105,7 +106,10 @@ export default function ComparePage() {
                   <th key={p.id} className="p-4 border-b-2 border-[#e8e0d4] text-center min-w-[200px]">
                     <div className="flex flex-col items-center gap-2">
                       <div className="relative">
-                        <Link to={path} className="text-5xl block hover:scale-105 transition">{emoji}</Link>
+                        <Link to={path} className="block hover:scale-105 transition">
+                          <ProductImage item={p} fallback={emoji} alt={nom}
+                            className="mx-auto h-24 w-auto max-w-[120px] rounded-lg" emojiClassName="text-5xl block" />
+                        </Link>
                         <button onClick={() => removeProduct(p.id)}
                           className="absolute -top-2 -right-2 w-5 h-5 bg-[#d44040] text-white rounded-full text-xs flex items-center justify-center hover:scale-110 transition">
                           ✕

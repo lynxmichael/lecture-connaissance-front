@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { getRecentlyViewed } from '../utils/recentlyViewed';
 import { formatCFA } from '../utils/currency';
 import { getEmoji } from '../utils/fournitures';
+import ProductImage from './ProductImage';
 
 export default function RecentlyViewed({ excludeId, excludeType }) {
   const [items, setItems] = useState([]);
@@ -28,7 +29,9 @@ export default function RecentlyViewed({ excludeId, excludeType }) {
           return (
             <Link key={`${item.type}-${item.id}`} to={path}
               className="flex-shrink-0 flex flex-col items-center gap-1.5 p-3 w-28 bg-white border border-[#e8e0d4] rounded-2xl hover:border-[#c9933a] hover:-translate-y-0.5 transition-all text-center group shadow-sm">
-              <span className="text-3xl group-hover:scale-110 transition-transform">{emoji}</span>
+              <ProductImage item={item} fallback={emoji}
+                className="w-12 h-14 rounded group-hover:scale-110 transition-transform"
+                emojiClassName="text-3xl group-hover:scale-110 transition-transform" />
               <p className="text-xs font-semibold text-[#0f1923] line-clamp-2 leading-tight" style={{fontFamily:'Playfair Display,serif'}}>
                 {item.nom}
               </p>

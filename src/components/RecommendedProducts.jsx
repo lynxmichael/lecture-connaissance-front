@@ -5,6 +5,7 @@ import ProductCard from './ProductCard';
 import BookCard from './BookCard';
 import { formatCFA } from '../utils/currency';
 import { getEmoji } from '../utils/fournitures';
+import ProductImage from './ProductImage';
 
 export default function RecommendedProducts({ productId, productType, onAddToCart, title = "Les clients ont aussi acheté" }) {
   const [products, setProducts] = useState([]);
@@ -49,8 +50,9 @@ export default function RecommendedProducts({ productId, productType, onAddToCar
           return (
             <div key={`${type}-${p.id}`} className="flex-shrink-0 w-44 bg-white rounded-2xl border border-[#e8e0d4] shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 group overflow-hidden">
               <Link to={path}>
-                <div className="text-5xl text-center py-4 bg-gradient-to-br from-[#faf7f2] to-[#ede5d4] group-hover:from-indigo-50 group-hover:to-blue-50 transition-colors">
-                  {emoji}
+                <div className="text-5xl text-center py-4 bg-gradient-to-br from-[#faf7f2] to-[#ede5d4]">
+                  <ProductImage item={p} fallback={emoji} alt={nom}
+                    className="mx-auto h-20 w-auto max-w-[80%] rounded" />
                 </div>
                 <div className="p-3">
                   <p className="text-[10px] font-bold text-[#c9933a] uppercase tracking-widest truncate">

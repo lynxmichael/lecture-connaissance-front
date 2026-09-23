@@ -2,6 +2,7 @@ import { useWishlist } from '../contexts/WishlistContext';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { formatCFA, discountPercent } from '../utils/currency';
+import ProductImage from '../components/ProductImage';
 
 function Countdown({ endAt }) {
   const [text, setText] = useState('');
@@ -70,9 +71,9 @@ export default function BookCard({ book, onAddToCart }) {
           className="absolute top-2 right-2 w-7 h-7 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-sm hover:scale-110 transition-all shadow-sm opacity-0 group-hover:opacity-100 z-10">
           {inWish ? '❤️' : '🤍'}
         </button>
-        <span className="block group-hover:scale-110 transition-transform duration-300 select-none">
-          {book.image || '📖'}
-        </span>
+        <ProductImage item={book} fallback={book.image || '📖'} alt={book.titre}
+          className="mx-auto h-28 w-auto max-w-[80%] rounded-lg shadow-sm group-hover:scale-110 transition-transform duration-300"
+          emojiClassName="block group-hover:scale-110 transition-transform duration-300 select-none" />
       </div>
 
       {/* Info */}

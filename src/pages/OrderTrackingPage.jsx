@@ -6,6 +6,7 @@ import { getEmoji } from '../utils/fournitures';
 import OrderDevis from '../components/OrderDevis';
 import { useAuth } from '../contexts/AuthContext';
 import { showToast } from '../components/Toast';
+import ProductImage from '../components/ProductImage';
 
 const TIMELINE = [
   { statut:'Validée',  icon:'✅', label:'Commande confirmée',   desc:'Votre paiement a été reçu.' },
@@ -154,7 +155,10 @@ export default function OrderTrackingPage() {
                     return (
                       <div key={item.id} className="flex items-center gap-3 px-5 py-3">
                         <Link to={isFourn ? `/fourniture/${item.fourniture_id}` : `/book/${item.book_id}`}
-                          className="text-2xl hover:scale-110 transition-transform">{emoji}</Link>
+                          className="hover:scale-110 transition-transform">
+                          <ProductImage item={isFourn ? item.fourniture : item.book} fallback={emoji}
+                            className="w-9 h-11 rounded" emojiClassName="text-2xl" />
+                        </Link>
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-[#0f1923] text-sm line-clamp-1">{nom}</p>
                           <p className="text-gray-400 text-xs">

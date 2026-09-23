@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { showToast } from '../components/Toast';
 import { formatCFA } from '../utils/currency';
+import ProductImage from '../components/ProductImage';
 
 export default function CartPage() {
   const {
@@ -71,7 +72,9 @@ export default function CartPage() {
                 className="flex items-center gap-4 bg-white border border-[#e8e0d4] rounded-2xl p-4 shadow-sm hover:shadow-md transition">
                 <Link to={item.item_type==="fourniture" ? `/fourniture/${item.fourniture_id}` : `/book/${item.book_id}`}
                   className="text-4xl flex-shrink-0 hover:scale-110 transition-transform select-none">
-                  {item.book?.image || item.fourniture?.image||'📖'}
+                  <ProductImage item={item.book || item.fourniture}
+                    fallback={item.book?.image || item.fourniture?.image || '📖'}
+                    className="w-14 h-16 rounded-lg shadow-sm" />
                 </Link>
 
                 <div className="flex-1 min-w-0">

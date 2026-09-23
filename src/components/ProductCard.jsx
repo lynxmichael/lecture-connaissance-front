@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { formatCFA, discountPercent } from '../utils/currency';
 import { getEmoji } from '../utils/fournitures';
+import ProductImage from '../components/ProductImage';
 
 export default function ProductCard({ product, type = 'book', onAddToCart }) {
   const navigate  = useNavigate();
@@ -69,7 +70,9 @@ export default function ProductCard({ product, type = 'book', onAddToCart }) {
         : isFourniture ? 'bg-gradient-to-br from-indigo-50 to-blue-50'
         : 'bg-gradient-to-br from-[#faf7f2] to-[#f0ebe0]'
       }`}>
-        <span className="block group-hover:scale-110 transition-transform duration-300">{emoji}</span>
+        <ProductImage item={product} fallback={emoji} alt={nom}
+          className="mx-auto h-28 w-auto max-w-[80%] rounded-lg shadow-sm group-hover:scale-110 transition-transform duration-300"
+          emojiClassName="block group-hover:scale-110 transition-transform duration-300" />
         <button onClick={handleWish}
           className="absolute top-2 right-2 w-7 h-7 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-sm hover:scale-110 transition-all shadow-sm opacity-0 group-hover:opacity-100">
           {inWish ? '❤️' : '🤍'}

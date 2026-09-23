@@ -7,6 +7,7 @@ import OrderDevis from '../components/OrderDevis';
 import { downloadBusinessDocument } from '../utils/pdfDocuments';
 import { showToast } from '../components/Toast';
 import { formatCFA } from '../utils/currency';
+import ProductImage from '../components/ProductImage';
 
 export default function OrdersPage() {
   const { user }   = useAuth();
@@ -118,7 +119,9 @@ export default function OrdersPage() {
                     {order.items?.map(item => (
                       <div key={item.id} className="flex justify-between items-center text-sm">
                         <div className="flex items-center gap-2">
-                          <span className="text-xl">{item.book?.image||'📖'}</span>
+                          <ProductImage item={item.book || item.fourniture}
+                            fallback={item.book?.image || '📖'}
+                            className="w-9 h-11 rounded" emojiClassName="text-xl" />
                           <div>
                             <Link to={`/book/${item.book_id}`}
                               className="font-semibold text-[#0f1923] hover:text-[#c9933a] transition">

@@ -4,6 +4,7 @@ import api from '../api/client';
 import { formatCFA } from '../utils/currency';
 import { getEmoji } from '../utils/fournitures';
 import { showToast } from '../components/Toast';
+import ProductImage from '../components/ProductImage';
 
 export default function StockAlertsPage() {
   const [stats,      setStats]      = useState(null);
@@ -114,7 +115,9 @@ function StockRow({ item, onRestock, restocking }) {
     <div className={`flex items-center gap-4 bg-white border-2 rounded-2xl px-5 py-4 shadow-sm ${
       item.quantite === 0 ? 'border-red-200' : 'border-orange-200'
     }`}>
-      <Link to={path} className="text-3xl flex-shrink-0 hover:scale-110 transition">{emoji}</Link>
+      <Link to={path} className="flex-shrink-0 hover:scale-110 transition">
+        <ProductImage item={item} fallback={emoji} className="w-12 h-14 rounded-lg" emojiClassName="text-3xl" />
+      </Link>
       <div className="flex-1 min-w-0">
         <Link to={path} className="font-bold text-[#0f1923] hover:text-[#c9933a] transition line-clamp-1"
           style={{fontFamily:'Playfair Display,serif'}}>

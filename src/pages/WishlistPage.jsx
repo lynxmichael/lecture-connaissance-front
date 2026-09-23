@@ -4,6 +4,7 @@ import { useCart } from '../contexts/CartContext';
 import { showToast } from '../components/Toast';
 import { formatCFA } from '../utils/currency';
 import { getEmoji } from '../utils/fournitures';
+import ProductImage from '../components/ProductImage';
 
 export default function WishlistPage() {
   const { wishlist, toggle } = useWishlist();
@@ -65,7 +66,10 @@ export default function WishlistPage() {
 
             return (
               <div key={item.id} className="bg-white border border-[#e8e0d4] rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition">
-                <Link to={path} className="text-4xl flex-shrink-0 hover:scale-110 transition-transform">{emoji}</Link>
+                <Link to={path} className="flex-shrink-0 hover:scale-110 transition-transform">
+                  <ProductImage item={product} fallback={emoji}
+                    className="w-14 h-16 rounded-lg shadow-sm" emojiClassName="text-4xl" />
+                </Link>
                 <div className="flex-1 min-w-0">
                   <p className="text-[10px] font-bold text-[#c9933a] uppercase tracking-widest">{categorie}</p>
                   <Link to={path} className="font-bold text-[#0f1923] hover:text-[#c9933a] line-clamp-1 transition" style={{fontFamily:'Playfair Display,serif'}}>

@@ -4,6 +4,7 @@ import api from '../api/client';
 import { useCart } from '../contexts/CartContext';
 import { showToast } from '../components/Toast';
 import { formatCFA } from '../utils/currency';
+import ProductImage from '../components/ProductImage';
 
 const NIVEAUX = ['Primaire','Collège','Lycée','Université','Tous'];
 
@@ -58,7 +59,8 @@ function BundleCard({ bundle, onAddAll }) {
               const emoji = item.item_type === 'fourniture' ? (item.fourniture?.image || '📦') : (item.book?.image || '📖');
               return (
                 <div key={item.id} className="flex items-center gap-2 text-sm">
-                  <span className="text-base flex-shrink-0">{emoji}</span>
+                  <ProductImage item={item.book || item.fourniture} fallback={emoji}
+                    className="w-6 h-7 rounded flex-shrink-0" emojiClassName="text-base flex-shrink-0" />
                   <span className="flex-1 truncate text-gray-700">{nom}</span>
                   <span className="text-gray-400 text-xs flex-shrink-0">×{item.quantite}</span>
                 </div>

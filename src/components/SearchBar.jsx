@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api/client';
 import { formatCFA } from '../utils/currency';
 import { getEmoji } from '../utils/fournitures';
+import ProductImage from '../components/ProductImage';
 
 export default function SearchBar({ placeholder = "Rechercher livres, fournitures…", fullPage = false }) {
   const [query,   setQuery]   = useState('');
@@ -96,7 +97,9 @@ export default function SearchBar({ placeholder = "Rechercher livres, fourniture
                   {results.books.map(book => (
                     <button key={book.id} onClick={() => goTo(`/book/${book.id}`)}
                       className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#faf7f2] transition text-left border-b border-[#e8e0d4]/50">
-                      <span className="text-2xl flex-shrink-0">{book.image || '📖'}</span>
+                      <ProductImage item={book} fallback={book.image || '📖'}
+                        className="w-8 h-10 rounded object-cover flex-shrink-0"
+                        emojiClassName="text-2xl flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-[#0f1923] text-sm truncate">{book.titre}</p>
                         <p className="text-gray-500 text-xs">{book.auteur} · {book.rayon}</p>
